@@ -1,23 +1,26 @@
-# queue-typescript 
+# hashlist-typescript 
 [![Build Status][travis-badge]][travis] [![Coverage Status][coveralls-badge]][coveralls]
 
-Simple Typescript [Queue][wiki] with generics type templating and support for iterator 
-and iterable protocols.
+Simple Typescript Linked List with hash table indexing. Supports generics type templating 
+iterator and iterable protocols.
 
-This queue uses the [linked-list-typescript][list] as the underlying datastructure.
+See Also:
+ - [linked-list-typescript][list]
+ - [stack-typescript][stack]
+ - [queue-typescript][queue]
 
 ## Installation
 
 [npm][]:
 
 ```bash
-npm install --save queue-typescript
+npm install --save hashlist-typescript
 ```
 
 [yarn][]:
 
 ```bash
-yarn add queue-typescript
+yarn add hashlist-typescript
 ```
 
 ## Building from source
@@ -53,52 +56,52 @@ yarn|npm run coverage:report
 Importing:
 
 ```typescript
-import { Queue } from 'queue-typescript';
-const { Queue } = require('queue-typescript')
+import { HashList } from 'hashlist-typescript';
+const { HashList } = require('hashlist-typescript')
 ```
 
 ## API
 
-### Queue<T>(...values: T[])
+### HashList<T>(...values: T[])
 
-#### Queue<T>()
+#### HashList<T>()
 
-Create an empty queue by omitting any arguments during instantiation.
+Create an empty linked list by omitting any arguments during instantiation.
 
 ```typescript
-let queue = new Queue<number>()
+let list = new HashList<number>()
 ```
 
-#### Queue<T>(...values: T[])
+#### HashList<T>(...values: T[])
 
-Create a new queue and initialize it with values. Values will be added from front
-to back. i.e. the first argument will be at the front of the queue and the last 
-argument will be at the back of the queue.
+Create a new list and initialize it with values. Values will be appended from left
+to right. i.e. the first argument will be at the head and the last argument will 
+be at the tail.
 
 Specify the type using the typescript templating to enable type-checking of all
-values going into and out of the queue.
+values going into and out of the list.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
+let list = new HashList<number>(...items);
 ```
 
 ```typescript
 let items: string[] = ['one', 'two', 'three', 'four'];
-let queue = new Queue<string>(...items);
+let list = new HashList<string>(...items);
 ```
 
 Typescript will check if the values match the type given to the template
-when initializing the new queue.
+when initializing the new list.
 
 ```typescript
 let items: = ['one', 'two', 'three', 4];
-let queue = new Queue<string>(...items); // arguments are not all strings
+let list = new HashList<string>(...items); // arguments are not all strings
 ```
 
-#### Queue<Foo>(...values: Foo[])
+#### HashList<Foo>(...values: Foo[])
 
-Create a new queue using custom types or classes. All values are retained as references
+Create a new list using custom types or classes. All values are retained as references
 and not copies so removed values can be compared using strict comparison.
 
 ```typescript
@@ -114,37 +117,39 @@ let foo1 = new Foo(1);
 let foo2 = new Foo(2);
 let foo3 = new Foo(3);
 
-let fooQueue = new Queue<Foo>(foo1, foo2, foo3)
+let fooList = new HashList<Foo>(foo1, foo2, foo3)
 
-fooQueue.front.bar // => 1
-let val = queue.dequeue()
+fooList.head.bar // => 1
+fooList.tail.bar // => 3
+let val = list.removeHead()
 val // => foo1
 ```
 
 
 
-#### Queue<any>(...values: any[])
+#### HashList<any>(...values: any[])
 
-Specify `any` to allow the queue to take values of any type.
+Specify `any` to allow the list to take values of any type.
 
 ```typescript
-let queue = new Queue<any>(4, 'hello' { hello: 'world' })
-queue.length // => 3
-queue.front // => 4
+let list = new HashList<any>(4, 'hello' { hello: 'world' })
+list.length // => 3
+list.head // => 4
+list.tail // => { hello: 'world' }
 ```
 
-#### Queue#[Symbol.iterator]
+#### HashList#[Symbol.iterator]
 
-The queue supports both iterator and iterable protocols allowing it to be used
+The list supports both iterator and iterable protocols allowing it to be used
 with the `for...of` and `...spread` operators and with deconstruction.
 
 `for...of`:
 
 ```typescript
 let items: number[] = [4, 5, 6];
-let queue = new Queue<number>(...items);
+let list = new HashList<number>(...items);
 
-for (let item of queue) {
+for (let item of list) {
   console.log(item)
 }
 //4
@@ -156,14 +161,14 @@ for (let item of queue) {
 
 ```typescript
 let items: number[] = [4, 5, 6];
-let queue = new Queue<number>(...items);
+let list = new HashList<number>(...items);
 
 function manyArgs(...args) {
   for (let i in args) {
     console.log(args[i])
   }
 }
-manyArgs(...queue);
+manyArgs(...list);
 //4
 //5
 //6
@@ -173,75 +178,185 @@ manyArgs(...queue);
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
+let list = new HashList<number>(...items);
 
-let [a, b, c] = queue;
+let [a, b, c] = list;
 //a => 4
 //b => 5
 //c => 6
 ```
 
-#### Queue<T>#front :T
+#### HashList<T>#head :T
 
-Peek at the front of the queue. This will not remove the value
-from the queue.
+Peek at the value at the head of the list. This will not remove the value
+from the list.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
-queue.front // => 4
+let list = new HashList<number>(...items);
+list.head // => 4
 ```
 
-#### Queue<T>#length :number
+#### HashList<T>#tail :T
 
-Query the length of the queue. An empty queue will return 0.
+Peek at the value at the tail of the list. This will not remove the value
+from the list.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
-queue.length // => 4
+let list = new HashList<number>(...items);
+list.tail // => 7
 ```
 
-#### Queue<T>#enqueue(val: T): boolean
+#### HashList<T>#length :number
 
-Enqueue an item at the back of the queue. The new item will replace the previous last item.
+Query the length of the list. An empty list will return 0.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
-queue.length // => 4
-queue.enqueue(8)
-queue.length // => 5
+let list = new HashList<number>(...items);
+list.length // => 4
 ```
 
-#### Queue<T>#dequeue(): T
+#### HashList<T>#append(val: T, checkDuplicates: boolean = false): string
 
-Removes the item from the front of the queue and returns the item.
+Append an item to the end of the list. The method returns a `key` that can be used
+to retrieve the value at a later time. The new item will replace the previous tail item
+and subsequent calls to [HashList<T>#head](#hashlistthead-t) will now recall the new item.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
-queue.length // => 4
-let val = queue.dequeue()
-queue.length // => 3
-queue.front // => 5
+let list = new HashList<number>(...items);
+list.length // => 4
+list.append(8)
+list.length // => 5
+list.tail // => 8
+```
+
+The optional argument `checkDuplicates` is `false` by default. If set to `true`, it will
+check if the new value is already contained in the list. If the value is found to be a
+duplicate it will not be added and the method will return `false`.
+
+Values are checked using strict `===` comparison. Checking for duplicates inserts the list
+into a [`Set`][set] and then checks if the value is contained in the set.
+
+Note that by default, duplicates will be added to the list. No collision handling is done as 
+the duplicates are stored in separate nodes of the underlying linked list.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+let key = list.append(5, true)
+list.length // => 4
+list.tail // => 7
+key // => uuid key for accessing the value.
+```
+
+#### HashList<T>#prepend(val: T, checkDuplicates: boolean = false): boolean
+
+Prepend an item to the beginning of the list. The method returns a `key` that can be used
+to retrieve the value at a later time. The new item will replace the previous head item
+and subsequent calls to `HashList<T>#head` will now recall the new item.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+list.prepend(3)
+list.length // => 5
+list.head // => 3
+```
+
+The optional argument `checkDuplicates` is `false` by default. If set to `true`, it will
+check if the new value is already contained in the list. If the value is found to be a 
+duplicate it will not be added and the method will return `false`.
+
+Values are checked using strict `===` comparison. Checking for duplicates inserts the list
+into a [`Set`][set] and then checks if the value is contained in the set. 
+
+Note that by default, duplicates will be added to the list. No collision handling is done as 
+the duplicates are stored in separate nodes of the underlying linked list.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+let key = list.prepend(4, true)
+list.length // => 4
+list.head // => 4
+key // => uuid key for accessing the value.
+```
+
+#### HashList<T>#removeHead(): T
+
+Removes the item at the head of the list and returns the item.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+let val = list.removeHead()
+list.length // => 3
+list.head // => 5
 val // => 4
 ```
 
-#### Queue<T>#toArray(): T[]
+#### HashList<T>#removeTail(): T
 
-This method simply returns `[...this]`.
-
-Converts the queue into an array and returns the array representation. This method does
-not mutate the queue in any way.
-
-Objects are not copied, so all non-primitive items in the array are still referencing
-the queue items.
+Removes the item at the tail of the list and returns the item.
 
 ```typescript
 let items: number[] = [4, 5, 6, 7];
-let queue = new Queue<number>(...items);
-let result = queue.toArray()
+let list = new HashList<number>(...items);
+list.length // => 4
+let val = list.removeTail()
+list.length // => 3
+list.tail // => 6
+val // => 7
+```
+
+#### HashList<T>#remove(key: string): T
+
+Removes the item, using the provided key, from the list and returns the item. If the 
+item can not be located in the list the method will return undefined and the list will
+not be altered.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+let key = list.append(8)
+let val = list.remove(key)
+list.length // => 4
+list.tail // => 7
+val // => 8
+```
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+list.length // => 4
+let val = list.remove('')
+list.length // => 4
+list.tail // => 7
+val // => undefined
+```
+
+#### HashList<T>#toArray(): T[]
+
+This method simply returns `[...this]`.
+
+Converts the list into an array and returns the array representation. This method does
+not mutate the list in any way.
+
+Objects are not copied, so all non-primitive items in the array are still referencing
+the list items.
+
+```typescript
+let items: number[] = [4, 5, 6, 7];
+let list = new HashList<number>(...items);
+let result = list.toArray()
 result // => [4, 5, 6, 7]
 ```
 
@@ -251,13 +366,13 @@ result // => [4, 5, 6, 7]
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/sfkiwi/queue-typescript.svg
+[travis-badge]: https://img.shields.io/travis/sfkiwi/hashlist-typescript.svg
 
-[travis]: https://travis-ci.org/sfkiwi/queue-typescript
+[travis]: https://travis-ci.org/sfkiwi/hashlist-typescript
 
-[coveralls-badge]: https://img.shields.io/coveralls/github/sfkiwi/queue-typescript.svg
+[coveralls-badge]: https://img.shields.io/coveralls/github/sfkiwi/hashlist-typescript.svg
 
-[coveralls]: https://coveralls.io/github/sfkiwi/queue-typescript
+[coveralls]: https://coveralls.io/github/sfkiwi/hashlist-typescript
 
 [npm]: https://docs.npmjs.com/cli/install
 
@@ -267,6 +382,12 @@ result // => [4, 5, 6, 7]
 
 [author]: http://github.com/sfkiwi
 
-[wiki]: https://en.wikipedia.org/wiki/Queue_(abstract_data_type)
+[wiki]: https://en.wikipedia.org/wiki/HashList_(abstract_data_type)
 
 [list]: https://www.npmjs.com/package/linked-list-typescript
+
+[stack]: https://www.npmjs.com/package/stack-typescript
+
+[queue]: https://www.npmjs.com/package/queue-typescript
+
+[hashlist]: https://www.npmjs.com/package/hashlist-typescript

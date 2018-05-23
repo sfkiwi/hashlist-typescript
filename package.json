@@ -1,13 +1,13 @@
 {
-  "name": "queue-typescript",
+  "name": "hashlist-typescript",
   "version": "1.0.0",
-  "description": "Simple Typescript Queue with generics type support",
+  "description": "Simple Typescript Linked List with Hash Table indexing and type templating",
   "main": "lib/src/index.js",
   "typings": "lib/src/index",
   "files": [
     "lib/src/"
   ],
-  "repository": "https://github.com/sfkiwi/queue-typescript.git",
+  "repository": "https://github.com/sfkiwi/hashlist-typescript.git",
   "author": "Mike Sutherland <mjfsutherland@gmail.com>",
   "license": "MIT",
   "private": false,
@@ -16,12 +16,12 @@
     "javascript",
     "linked-list",
     "linkedlist",
-    "queue"
+    "hashtable"
   ],
   "bugs": {
-    "url": "https://github.com/sfkiwi/queue-typescript/issues"
+    "url": "https://github.com/sfkiwi/hashlist-typescript/issues"
   },
-  "homepage": "https://github.com/sfkiwi/queue-typescript#readme",
+  "homepage": "https://github.com/sfkiwi/hashlist-typescript#readme",
   "scripts": {
     "pretest": "yarn run build",
     "build": "tsc",
@@ -47,6 +47,7 @@
     "typescript": "^2.8.1"
   },
   "dependencies": {
-    "linked-list-typescript": "^1.0.11"
+    "@types/uuid": "^3.4.3",
+    "uuid": "^3.2.1"
   }
 }
